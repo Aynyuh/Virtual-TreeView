@@ -5786,9 +5786,9 @@ begin
       inherited
     else
     begin
-      // We need an extra check for the control drag object as there might be other objects not derived from
-      // this class (e.g. TActionDragObject).
-      if not (tsUserDragObject in FStates) and (S is TBaseDragControlObject) then
+      // We need an extra check for the control drag object as there might be other objects not derived from this class (e.g. TActionDragObject).
+      // Original line of code (see issue #1295): if not (tsUserDragObject in FStates) and (S is TBaseDragControlObject) then
+      if (S.ClassName = TDragControlObject.ClassName) or (S.ClassName = TDragControlObjectEx.ClassName) then  // see issue #1295
         S := (S as TBaseDragControlObject).Control;
       case DragMessage of
         dmDragEnter, dmDragLeave, dmDragMove:
@@ -11833,7 +11833,7 @@ begin
   Index := -1;
   Ghosted := False;
   lImageList := DoGetImageIndex(Node, Kind, Column, Ghosted, Index);
-  if Index >= 0 then begin
+  if (Index > NoImage) or (Index = EmptyImage) then begin
     if IncludePadding then
       Result.cx := lImageList.Width + ScaledPixels(2)
     else
@@ -20628,7 +20628,6 @@ begin
                             ((Column = FEditColumn) or not UseColumns)) then
                             DoPaintNode(PaintInfo);
 
-                          Canvas.Brush.Color := FColors.BackGroundColor; // Set useful background color, see issue #1264
                           DoAfterCellPaint(Canvas, Node, Column, CellRect);
                         end;
                       end;
